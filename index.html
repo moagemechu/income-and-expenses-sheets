@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>የግል ፋይናንስ መከታተያ</title>
+    <style>
+        body { font-family: 'Nyala', Ethiopia Jiret, sans-serif; margin: 20px; background-color: #f4f6f9; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        .summary { display: flex; justify-content: space-between; margin-bottom: 20px; padding: 15px; background: #e9ecef; border-radius: 6px; }
+        .summary-card { text-align: center; flex: 1; }
+        .summary-card h3 { margin: 0 0 10px 0; font-size: 1.1em; color: #666; }
+        .summary-card p { margin: 0; font-size: 1.5em; font-weight: bold; color: #2c3e50; }
+        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        input, select, button { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+        .income { color: green; }
+        .expense { color: red; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>የገቢ እና ወጪ መከታተያ</h2>
+    
+    <div class="summary">
+        <div class="summary-card">
+            <h3>ጠቅላላ ገቢ</h3>
+            <p id="total-income">0.00</p>
+        </div>
+        <div class="summary-card">
+            <h3>ጠቅላላ ወጪ</h3>
+            <p id="total-expense">0.00</p>
+        </div>
+        <div class="summary-card">
+            <h3>የተረፈ ሂሳብ</h3>
+            <p id="net-balance">0.00</p>
+        </div>
+    </div>
+
+    <form id="transaction-form">
+        <input type="date" id="date" required>
+        <select id="type">
+            <option value="income">ገቢ</option>
+            <option value="expense">ወጪ</option>
+        </select>
+        <input type="text" id="description" placeholder="መግለጫ (ለምሳሌ፡ ደመወዝ)" required>
+        <input type="number" id="amount" placeholder="መጠን (ብር)" step="0.01" required>
+        <button type="submit">መዝግብ</button>
+    </form>
+
+    <table id="transaction-table">
+        <thead>
+            <tr>
+                <th>ቀን</th>
+                <th>ዓይነት</th>
+                <th>መግለጫ</th>
+                <th>መጠን (ብር)</th>
+            </tr>
+        </thead>
+        <tbody id="transaction-list">
+            <!-- መረጃዎች እዚህ ይገባሉ -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const form = document.getElementById('transaction-form');
+    const transactionList = document.getElementById('transaction-list');
+    const totalIncomeEl = document.getElementById('total-income');
+    const totalExpenseEl = document.getElementById('total-expense');
+    const netBalanceEl = document.getElementById('net-balance');
+
+    let transactions = [];
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const date = document.getElementById('date').value;
+        const type = document.getElementById('type').value;
+        const description = document.getElementById('description').value;
+        const amount = parseFloat(document.getElementById('amount').value);
+
+        const transaction = { id: Date.now(), date, type, description, amount };
+        transactions.push(transaction);
+        
+        updateUI();
+        form.reset();
+    });
+
+    function updateUI() {
+        transactionList.innerHTML = '';
+        let totalIncome = 0;
+        let totalExpense = 0;
+
+        transactions.forEach(t => {
+            if (t.type === 'income') totalIncome += t.amount;
+            if (t.type === 'expense') totalExpense += t.amount;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${t.date}</td>
+                <td>${t.type === 'income' ? 'ገቢ' : 'ወጪ'}</td>
+                <td>${t.description}</td>
+                <td class="${t.type}">${t.amount.toFixed(2)}</td>
+            `;
+            transactionList.appendChild(row);
+        });
+
+        const netBalance = totalIncome - totalExpense;
+
+        totalIncomeEl.textContent = totalIncome.toFixed(2);
+        totalExpenseEl.textContent = totalExpense.toFixed(2);
+        netBalanceEl.textContent = netBalance.toFixed(2);
+    }
+</script>
+
+</body>
+</html>
